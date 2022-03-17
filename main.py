@@ -3,12 +3,14 @@ import sys
 import cv2
 import numpy as np
 
-print(sys.argv)
-
 for path in sys.argv[1:]:
     print(path[-3:])
     if path[-3:] != "gif":
         print(f"{path}はgif以外の形式なので正常に処理されませんでした。")
+        print("処理を続けますか？ y/N")
+        if input() != "y":
+            sys.exit(1)
+
         continue
 
     try:
@@ -30,8 +32,12 @@ for path in sys.argv[1:]:
 
     except Exception as e:
         print(f"エラーが発生しました。({path})")
-        print("スキップします。")
         print(e)
+
+        print("処理を続けますか？ y/N")
+        if input() != "y":
+            sys.exit(1)
+
         continue
 
 cv2.destroyAllWindows()

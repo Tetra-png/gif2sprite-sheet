@@ -28,7 +28,7 @@ for path in sys.argv[1:]:
         output_image = cv2.hconcat(images)
         output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2BGRA)
         output_image[:, :, 3] = np.where(np.all(output_image == 255, axis=-1), 0, 255)  # 白色のみTrueを返し、Alphaを0にする
-        cv2.imwrite(f"{path}.png", output_image)
+        cv2.imwrite(f"{path[:-3]}.png", output_image)
 
     except Exception as e:
         print(f"エラーが発生しました。({path})")

@@ -1,43 +1,40 @@
 import sys
 
-import cv2
+import imageio
 import numpy as np
 
-for path in sys.argv[1:]:
-    print(path[-3:])
-    if path[-3:] != "gif":
-        print(f"{path}はgif以外の形式なので正常に処理されませんでした。")
-        print("処理を続けますか？ y/N")
-        if input() != "y":
-            sys.exit(1)
 
-        continue
+def main():
+    for path in sys.argv[1:]:
+        if path[-3:] != "gif":
+            print(f"{path}はgif以外の形式なので正常に処理されませんでした。")
+            print("処理を続けますか？ y/N")
+            if input() != "y":
+                sys.exit(1)
 
-    try:
-        cap = cv2.VideoCapture(path)
+            continue
 
-        images = []
+        try:
+            cap = imageio.get_reader(path)
+            for i, frame in enumerate(cap):
+                # print(frame.shape)
+                if i == 0:
+                    result = frame
+                else:
+                    result = np.hstack([result, frame])
 
-        while(cap.isOpened()):
-            ret, frame = cap.read()
-            if ret:
-                images.append(frame)
-            else:
-                cap.release()
+            imageio.imwrite(f"{path[:-4]}.png", result)
 
-        output_image = cv2.hconcat(images)
-        output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2BGRA)
-        output_image[:, :, 3] = np.where(np.all(output_image == 255, axis=-1), 0, 255)  # 白色のみTrueを返し、Alphaを0にする
-        cv2.imwrite(f"{path[:-4]}.png", output_image)
+        except Exception as e:
+            print(f"エラーが発生しました。({path})")
+            print(e)
 
-    except Exception as e:
-        print(f"エラーが発生しました。({path})")
-        print(e)
+            print("処理を続けますか？ y/N")
+            if input() != "y":
+                sys.exit(1)
 
-        print("処理を続けますか？ y/N")
-        if input() != "y":
-            sys.exit(1)
+            continue
 
-        continue
 
-cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()
